@@ -22,3 +22,21 @@ jobs:
 
       - name: Maven 빌드
         run: mvn clean package
+
+      - name: WAR 파일 서버로 전송
+        uses: appleboy/scp-action@v0.1.1
+        with:
+          host: ${{ secrets.UBUNTU_HOST }}
+          username: ${{ secrets.UBUNTU_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "target/*.war"
+          target: "/home/master/tomcat/webapps/"
+
+      - name: Tomcat 재시작
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.UBUNTU_HOST }}
+          username: ${{ secrets.UBUNTU_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker restart my-tomcat
